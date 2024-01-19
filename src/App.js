@@ -1,18 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 function App() {
-
-  const [data, setData] = useState('');
+  const [value, setValue] = useState('');
 
   useEffect(() => {
-    (async function () {
-      const { text } = await( await fetch(`https://qsv3functionapp.azurewebsites.net/api/HttpTriggerSQL`)).json();
-      setData(text);
-    })();
-  });
+    fetch(`https://qsv3functionapp.azurewebsites.net/api/HttpTriggerSQL`, {
+      method: "GET",
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setValue(res.data)
+      })
+  }, [])
 
-  return <div>{data}</div>;
-  
+  return <div>{value}</div>;
 }
 
 export default App;
