@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 function App() {
   const [data, setValue] = useState([]);
+  const [userInput, setUserInput] = useState('');
 
-  useEffect(() => {
-
-const fetchData = async () => {
+  // useEfect is just for retrieving data, the rest is for updating 
+  const fetchData = async () => {
     // const respo = await fetch(`http://localhost:7071/api/HttpTriggerSQL`, { //dev
     const respo = await fetch(`https://qsv3functionapp.azurewebsites.net/api/HttpTriggerSQL`, { //prod
       method: "GET",
@@ -19,11 +19,56 @@ const fetchData = async () => {
     // console.log(responseData)
     setValue(responseData)
   };
-  fetchData();
+  useEffect(() => { fetchData();}, [])
+// this is the data updater part 
 
-}, [])
-  
+  // Step 3: Update State on Input Change
+  const handleInputChange = (event) => {
+    setUserInput(event.target.value);
+  };
+
+  // Step 4: Create an Object with User Input
+  const createObject = () => {
+    console.log(userInput)
+    const dataObject = {
+      Message: userInput,
+    };
+    // Step 5: Send Object to API Endpoint
+
+    sendDataToApi(dataObject);
+    setUserInput(''); //reset input box
+    fetchData(); //refresh table
+
+  };
+
+  const sendDataToApi = (dataObject) => {
+  // fetch(`http://localhost:7071/api/Updater`, { //dev
+  fetch(`https://qsv3functionapp.azurewebsites.net/api/Updater`, { //prod
+    method: "POST",
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(dataObject) //doesn't work without the stringify
+  }) 
+  .then(response => response.json())
+  .then(data => {
+    // Handle the API response as needed
+    console.log(data);
+  })
+  .catch(error => {
+    // Handle errors
+    console.error('Error:', error);
+  });}
+
 return (
+
+  <Fragment>
+  {/* Step 1: Capture User Input */}
+  <input type="text" value={userInput} onChange={handleInputChange} />
+
+  {/* Trigger API call */}
+  <button onClick={createObject}>Submit</button>
+
   <div className="container mt-4">
     <table className="table table-bordered table-dark">
       <thead className="thead-light">
@@ -44,6 +89,7 @@ return (
       </tbody>
     </table>
   </div>
+  </Fragment>
 );
 
 
