@@ -117,9 +117,13 @@ return (
   {/* Trigger API call */}
 
 </div>
-<h2> Sometimes refresh page to see SQL updates, sometimes works real good, sometimes server is asleep ;:-/ </h2>
-<h2>SQL Table</h2>
+<div>
+
+</div>
   <div className="container mt-4">
+  <h4> Sometimes refresh page to see SQL updates, sometimes works real good, sometimes server is asleep ;:-/ </h4>
+  
+<h2>SQL Table</h2>
     <table className="table table-bordered table-dark">
       <thead className="thead-light">
         <tr>
