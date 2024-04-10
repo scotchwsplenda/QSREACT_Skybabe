@@ -4,12 +4,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 function Data() {
   const [data, setValue] = useState([]);
-  const [userInput, setUserInput] = useState('');
+  const [userInput, setUserInput] = useState('');  
+  const [tableData, setTableData] = useState([]);// Initialize state to hold table data
+
 
   // useEfect is just for retrieving data, the rest is for updating 
   const fetchData = async () => {
-    // const respo = await fetch(`http://localhost:7071/api/HttpTriggerSQL`, { //dev
-    const respo = await fetch(`https://qsv3functionapp.azurewebsites.net/api/HttpTriggerSQL`, { //prod
+    const respo = await fetch(`http://localhost:7071/api/HttpTriggerSQL`, { //dev
+    // const respo = await fetch(`https://qsv3functionapp.azurewebsites.net/api/HttpTriggerSQL`, { //prod
       method: "GET",
       headers: {
         'Content-Type': 'application/json'
@@ -36,14 +38,27 @@ function Data() {
     // Step 5: Send Object to API Endpoint
 
     sendDataToApi(dataObject);
+
+    // Step 6. send object to JS table
+    sendDataToJSTab(dataObject);
+
+
     setUserInput(''); //reset input box
     fetchData(); //refresh table
 
   };
 
+
+  const sendDataToJSTab = (dataObject) => {
+    // Update the state with the new tableData
+    console.log("wecwec",tableData)
+    const updatedTableData = [...tableData, dataObject.Message];
+    setTableData(updatedTableData);
+    console.log("updatedTableData",updatedTableData)
+  }
   const sendDataToApi = (dataObject) => {
-  // fetch(`http://localhost:7071/api/Updater`, { //dev
-  fetch(`https://qsv3functionapp.azurewebsites.net/api/Updater`, { //prod
+  fetch(`http://localhost:7071/api/Updater`, { //dev
+  // fetch(`https://qsv3functionapp.azurewebsites.net/api/Updater`, { //prod
     method: "POST",
     headers: {
       'Content-Type': 'application/json'
@@ -63,13 +78,47 @@ function Data() {
 return (
 
   <Fragment>
+
 <div className='container'>
   {/* Step 1: Capture User Input */}
   <input type="text" value={userInput} onChange={handleInputChange} />
 
-  {/* Trigger API call */}
+{/*the button */}
   <button onClick={createObject}>Submit</button>
+
+{/*JS Table*/}
+<h2>JS Table</h2>
+<div className="container mt-4">
+
+
+      {/* Render the table using tableData state */}
+      <table className="table table-bordered table-dark">
+        <thead>
+          <tr>
+            <th>ID</th>
+          
+          </tr>
+        </thead>
+        <tbody>
+                {tableData.map(item => (
+          <tr key={item}>
+            <td>{item}</td>
+
+          </tr>
+        ))}
+         
+          
+        </tbody>
+      </table>
+  </div>
+
+  
+
+  {/* Trigger API call */}
+
 </div>
+<h2> Sometimes refresh page to see SQL updates, sometimes works real good, sometimes server is asleep ;:-/ </h2>
+<h2>SQL Table</h2>
   <div className="container mt-4">
     <table className="table table-bordered table-dark">
       <thead className="thead-light">
@@ -90,6 +139,7 @@ return (
       </tbody>
     </table>
   </div>
+
   </Fragment>
 );
 
